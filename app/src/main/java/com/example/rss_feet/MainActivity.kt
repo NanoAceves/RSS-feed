@@ -39,25 +39,25 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val recyclerView: Recyclerview= findViewById(R.id.xmlRecyclerView)
+        val recyclerView: RecyclerView= findViewById(R.id.xmlRecyclerView)
 
         Log.d(TAG, "onCreate")
 
-        val downloadData = DownloadData()
-        downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml")
+        val downloadData = DownloadData(this, recyclerView)
+        downloadData.execute("https://mynintendonews.com/feed/")
         Log.d(TAG, "onCreate DONE")
     }
 
     companion object {
-        private class DownloadData : AsyncTask<String, Void, String>() {
+        private class DownloadData (context: Context, recyclerView: RecyclerView ): AsyncTask<String, Void, String>() {
             private val TAG = "DownloadData"
 
             var localContext: Context by Delegates.notNull()
-            var localRecyclerView: RecyclerView by ActionBarDrawerToggle.Delegate.notNull()
+            var localRecyclerView: RecyclerView by Delegates.notNull()
 
             init{
-                localContext=context
-                localRecyclerView= recyclerView
+                localContext = context
+                localRecyclerView = recyclerView
             }
 
             override fun doInBackground(vararg url: String?): String {
@@ -81,19 +81,8 @@ class MainActivity : AppCompatActivity() {
                 localRecyclerView.layoutManager= LinearLayoutManager(localContext)
             }
 
-            private fun downloadXML(urlPath: String?): String {
-                try {
-                    return URL(urlPath).readText()
-                } catch (e: Exception) {
-                    val errorMessage: String = when (e) {
-                        is MalformedURLException -> "downloadXML: Invalid URL ${e.message}"
-                        is IOException -> "downloadXML: IOException reading data ${e.message}"
-                        else -> "downloadXML: Unknown Error ${e.message}"
-                    }
-                    Log.e(TAG, errorMessage)
-
-                }
-                return ""
+            private fun downloadXML(urlPath: String?):String{
+                return URL(urlPath).readText()
             }
         }
     }
